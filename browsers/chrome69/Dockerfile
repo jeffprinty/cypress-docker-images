@@ -10,7 +10,7 @@ RUN \
   wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
   echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
   apt-get update && \
-  apt-get install -y dbus-x11 google-chrome-stable && \
+  apt-get install -y dbus-x11 google-chrome-stable golang-go && \
   rm -rf /var/lib/apt/lists/*
 
 # "fake" dbus address to prevent errors
@@ -19,8 +19,17 @@ ENV DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 # Add zip utility - it comes in very handy
 RUN apt-get update && apt-get install -y zip
+WORKDIR /tmp
+
+# Add consul cli for retrieving configuration
+RUN curl -so consul.zip https://releases.hashicorp.com/consul/1.4.2/consul_1.4.2_linux_amd64.zip
+RUN unzip consul.zip
+RUN ls -la
+RUN mv consul /usr/local/bin/consul && \
+  chmod +x /usr/local/bin/consul
 
 # versions of local tools
+RUN consul -v
 RUN node -v
 RUN npm -v
 RUN yarn -v
